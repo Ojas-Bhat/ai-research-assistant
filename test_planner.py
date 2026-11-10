@@ -9,4 +9,9 @@ plan = planner.plan(research_topic)
 
 print("\nRESEARCH PLAN")
 print("=" * 50)
-print(plan)
+
+print("Topic:", plan["topic"])
+
+for task in plan["tasks"]:
+    print(f"\nTask {task['task_id']}:")
+    print(task["description"])

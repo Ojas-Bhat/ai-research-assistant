@@ -1,34 +1,43 @@
 
+import json
 from llm import generate_response
 
 
 class PlannerAgent:
-
     def __init__(self):
         self.role = "Research Planner"
         self.goal = "Break a research topic into clear, actionable tasks."
 
-    def plan(self, topic: str) -> str:
-
+    def plan(self, topic: str) -> dict:
         prompt = f"""
-        You are an expert {self.role}.
+        You are an expert research planner.
 
-        Your goal is: {self.goal}
+        Research topic: {topic}
 
-        Given the following research topic:
-        {topic}
+        Break this topic into exactly 5 specific research tasks.
 
-        Break this topic into 5 specific research tasks.
+        Return your response in this exact JSON structure:
 
-        Each task must:
-        - Focus on one aspect of the topic.
-        - Be clear and actionable.
-        - Help answer the overall research question.
+        {{
+            "topic": "{topic}",
+            "tasks": [
+                {{
+                    "task_id": 1,
+                    "description": "Research task description"
+                }}
+            ]
+        }}
 
-        Return the tasks as a numbered list.
-        Do not write anything else.
+        Return valid JSON only.
+        Do not include markdown formatting or explanations.
         """
 
         response = generate_response(prompt)
 
-        return response
+        try:
+            plan = json.loads(response)
+            return plan
+        except json.JSONDecodeError:
+            raise ValueError(
+                f"Planner returned invalid JSON:\n{response}"
+            )
